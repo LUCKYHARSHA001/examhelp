@@ -105,4 +105,28 @@ router.post('/login', authRateLimiter, async (req, res) => {
 });
 
 
+// POST /api/auth/refresh
+router.post('/refresh', authRateLimiter, async (req, res) => {
+  const rawRefreshToken = req.cookies?.refreshToken;
+
+  if (!rawRefreshToken) {
+    return res.status(401).json({ error: 'No refresh token', code: 'NO_REFRESH_TOKEN' });
+  }
+
+  try {
+    const decoded = verifyRefreshToken(rawRefreshToken);
+    const record = await validateRefreshToken(rawRefreshToken, decoded.id);
+
+    if (!record) {
+      return res.status(401).json({ error: 'Invalid or revoked refresh token', code: 'INVALID_REFRESH_TOKEN' });
+    }
+
+    const newAccessToken = signAccessToken({ id: decoded.id, email: decoded.email });
+    res.json({ accessToken: newAccessToken });
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid refresh token', code: 'INVALID_REFRESH_TOKEN' });
+  }
+});
+
+
 export default router;
