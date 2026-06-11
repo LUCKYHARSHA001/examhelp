@@ -279,3 +279,11 @@ vercel deploy
 
 ---
 
+## Summary Modes
+
+| Exam Time | Strategy |
+|---|---|
+| 1 Hour | Critical bullet points only — survival mode |
+| Tomorrow | Concise structured summary with key exam points |
+| 3–5 Days | Full study guide with headings and definitions |
+| 1 Week+ | Comprehensive notes + 5 practice questions |
