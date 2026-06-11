@@ -128,5 +128,17 @@ router.post('/refresh', authRateLimiter, async (req, res) => {
   }
 });
 
+// POST /api/auth/logout
+router.post('/logout', async (req, res) => {
+  const rawRefreshToken = req.cookies?.refreshToken;
+
+  if (rawRefreshToken) {
+    await revokeRefreshToken(rawRefreshToken).catch(() => {});
+  }
+
+  res.clearCookie('refreshToken', COOKIE_OPTIONS);
+  res.json({ message: 'Logged out successfully' });
+});
+
 
 export default router;
