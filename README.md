@@ -167,3 +167,96 @@ The app will be at http://localhost:5173.
 
 ---
 
+## Google OAuth Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a project → APIs & Services → Credentials
+3. Create OAuth 2.0 Client ID (Web application)
+4. Add authorized redirect URI: `http://localhost:5000/api/auth/google/callback`
+5. Copy Client ID and Secret to `server/.env`
+
+---
+
+## Authentication Modes
+
+StudySnap now supports two sign-in flows:
+
+- **Google OAuth**: one-click sign in with Google.
+- **Email/Password (manual auth)**: create an account and sign in with credentials.
+
+Behavior details:
+
+- If an email already exists as a Google-only account, manual signup/login returns guidance to continue with Google.
+- If a user signs up manually first, later Google sign-in with the same email links that Google account to the same user.
+- Auth responses include a short-lived access token and set a secure HTTP-only refresh-token cookie.
+
+---
+
+## Gemini API
+
+1. Go to [Google AI Studio](https://aistudio.google.com/)
+2. Create an API key
+3. Add to `server/.env` as `GEMINI_API_KEY`
+
+The app uses `gemini-2.5-flash` for fast, low-latency streaming summaries.
+If your host has stream parsing issues, set `GEMINI_DISABLE_STREAM=true` in `server/.env` to force non-stream generation.
+
+---
+
+## Deployment
+
+### Frontend → Vercel
+```bash
+cd client
+vercel deploy
+# Set VITE_API_URL to your Render backend URL
+```
+
+### Backend → Render
+- Create a new Web Service pointing to `/server`
+- Start command: `npm start`
+- Add all env vars from `.env.example`
+
+### Worker → Render
+- Create a separate Background Worker service
+- Root directory: `/server`
+- Start command: `npm run worker`
+
+### Database → MongoDB Atlas
+- Create a cluster and grab the `MONGODB_URI` connection string
+- Add it to your environment variables in Render/production
+
+### Redis → Upstash
+- Create a Redis database
+- Use the `REDIS_URL` from Upstash dashboard
+
+---
+
+## API Reference
+
+### Auth
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/auth/signup` | Create account with name, email, and password |
+| POST | `/api/auth/login` | Sign in with email/password |
+| GET | `/api/auth/google` | Initiate Google OAuth |
+| GET | `/api/auth/google/callback` | OAuth callback |
+| POST | `/api/auth/refresh` | Refresh access token |
+| POST | `/api/auth/logout` | Revoke refresh token + clear cookie |
+
+### Summaries
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/summarize` | Upload PDF + enqueue job |
+| GET | `/api/summary/:id/stream` | SSE stream of live output |
+| GET | `/api/summaries` | All user summaries |
+| GET | `/api/summary/:id` | Single summary |
+| DELETE | `/api/summary/:id` | Delete summary |
+
+### User
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/user/me` | Current user + daily usage |
+
+---
+
