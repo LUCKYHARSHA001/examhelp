@@ -7,6 +7,10 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
+import './services/passportStrategy.js';
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -20,6 +24,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(passport.initialize());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 StudySnap server running on port ${PORT}`);
