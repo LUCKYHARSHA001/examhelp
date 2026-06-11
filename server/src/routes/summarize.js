@@ -104,5 +104,145 @@ router.post('/summarize', verifyJWT, upload.single('pdf'), async (req, res) => {
   }
 });
 
+// GET /api/summary/:summaryId/stream — SSE streaming
+// EventSource cannot send custom headers so accept token from query param too
+const verifyJWTOrQuery = (req, res, next) => {
+  if (!req.headers.authorization && req.query.token) {
+    req.headers.authorization = 'Bearer ' + req.query.token;
+  }
+  return verifyJWT(req, res, next);
+};
+
+router.get('/summary/:summaryId/stream', verifyJWTOrQuery, async (req, res) => {
+  const { summaryId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const summary = await Summary.findById(summaryId);
+
+    if (!summary) {
+      return res.status(404).json({ error: 'Summary not found', code: 'NOT_FOUND' });
+    }
+
+    if (summary.userId.toString() !== userId) {
+      return res.status(403).json({ error: 'Forbidden', code: 'FORBIDDEN' });
+    }
+
+    // If already done, send full text immediately
+    if (summary.status === 'DONE') {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.write(`data: ${JSON.stringify({ chunk: summary.summaryText })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      return res.end();
+    }
+
+    if (summary.status === 'FAILED') {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.write(`data: ${JSON.stringify({ error: summary.errorMsg || 'Summary failed' })}\n\n`);
+      return res.end();
+    }
+
+    // Set up SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    // Subscribe to Redis pub/sub
+    const subscriber = createIsolatedRedisClient();
+    await subscriber.connect();
+    const channel = `summary:${summaryId}`;
+    let onMessage = null;
+
+    let closed = false;
+    let timeout;
+    let heartbeat;
+
+    const resetIdleTimeout = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (!closed) {
+          // Gracefully close idle connections and let client polling continue.
+          cleanup();
+          res.end();
+        }
+      }, SSE_IDLE_TIMEOUT_MS);
+    };
+
+    const cleanup = () => {
+      if (!closed) {
+        closed = true;
+        clearTimeout(timeout);
+        clearInterval(heartbeat);
+        subscriber.unsubscribe(channel).catch(() => {});
+        if (onMessage) subscriber.off('message', onMessage);
+        subscriber.quit().catch(() => {});
+      }
+    };
+
+    req.on('close', cleanup);
+
+    // ioredis delivers pub/sub messages via the `message` event.
+    onMessage = (receivedChannel, message) => {
+      if (closed) return;
+      if (receivedChannel !== channel) return;
+      try {
+        const data = JSON.parse(message);
+        if (!data || typeof data !== 'object') {
+          return;
+        }
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+        resetIdleTimeout();
+
+        if (data.done || data.error) {
+          cleanup();
+          res.end();
+        }
+      } catch (e) {
+        console.error('[SSE parse error]', e);
+      }
+    };
+
+    subscriber.on('message', onMessage);
+    await subscriber.subscribe(channel);
+
+    // Race-condition guard:
+    // if the worker marked DONE/FAILED between the initial status check and the
+    // moment this subscription became active, Redis pub/sub may not replay that
+    // event. Re-read DB state once and flush terminal state immediately.
+    const latest = await Summary.findById(summaryId);
+    if (!closed && latest?.status === 'DONE') {
+      res.write(`data: ${JSON.stringify({ chunk: latest.summaryText || '' })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      cleanup();
+      return res.end();
+    }
+
+    if (!closed && latest?.status === 'FAILED') {
+      res.write(`data: ${JSON.stringify({ error: latest.errorMsg || 'Summary failed' })}\n\n`);
+      cleanup();
+      return res.end();
+    }
+
+    // Keep the connection alive through proxies/browser idle limits.
+    heartbeat = setInterval(() => {
+      if (!closed) {
+        res.write(': ping\n\n');
+      }
+    }, SSE_HEARTBEAT_MS);
+
+    resetIdleTimeout();
+  } catch (err) {
+    console.error('[SSE Stream]', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Stream error', code: 'SERVER_ERROR' });
+    }
+  }
+});
 
 export default router;
