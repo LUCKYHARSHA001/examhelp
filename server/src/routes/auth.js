@@ -68,5 +68,41 @@ router.post('/signup', authRateLimiter, async (req, res) => {
   return res.status(201).json({ accessToken });
 });
 
+// POST /api/auth/login — email/password login
+router.post('/login', authRateLimiter, async (req, res) => {
+  const email = normalizeEmail(req.body?.email);
+  const password = String(req.body?.password || '');
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'email and password are required', code: 'MISSING_FIELDS' });
+  }
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email', code: 'INVALID_EMAIL' });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' });
+  }
+  if (!user.passwordHash) {
+    return res.status(409).json({
+      error: 'This account uses Google sign-in. Please sign in with Google.',
+      code: 'ACCOUNT_OAUTH_ONLY',
+    });
+  }
+
+  const ok = await bcrypt.compare(password, user.passwordHash);
+  if (!ok) {
+    return res.status(401).json({ error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' });
+  }
+
+  const accessToken = signAccessToken({ id: user.id, email: user.email });
+  const rawRefreshToken = signRefreshToken({ id: user.id, email: user.email });
+  await createRefreshTokenRecord(user.id, rawRefreshToken);
+  res.cookie('refreshToken', rawRefreshToken, COOKIE_OPTIONS);
+
+  return res.json({ accessToken });
+});
+
 
 export default router;
