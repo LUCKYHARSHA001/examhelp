@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 
 import authRoutes from './routes/auth.js';
+import summarizeRoutes from './routes/summarize.js';
+import summariesRoutes from './routes/summaries.js';
 import userRoutes from './routes/user.js';
 import './services/passportStrategy.js';
 
@@ -26,6 +28,8 @@ app.use(morgan('dev'));
 app.use(passport.initialize());
 
 app.use('/api/auth', authRoutes);
+app.use('/api', summarizeRoutes);
+app.use('/api', summariesRoutes);
 app.use('/api/user', userRoutes);
 
 app.listen(PORT, () => {
