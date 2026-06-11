@@ -260,3 +260,22 @@ vercel deploy
 
 ---
 
+## UX Notes
+
+- **Summary generation UI**: The app shows a progressive generation state while processing, then renders summary output when available.
+- **Stream resilience**: If SSE events are delayed/missed, the client polls `/api/summary/:id` every few seconds and auto-resolves to `DONE`/`FAILED`.
+- **Hybrid output behavior**: When SSE is healthy, summary content appears chunk-by-chunk; if events are missed, full summary appears once generation completes.
+- **Theme support**: Light and dark mode are available via the header toggle and persisted in `localStorage`.
+
+---
+
+## Rate Limits
+
+- **Per user**: 10 summaries/day (resets at midnight)
+- **Auth routes**: 20 requests per 15 minutes per IP
+- **File size**: Max 10MB PDF
+- **Text extraction**: Max 50,000 characters (truncated with notice)
+- **AI prompt input**: Study material sent to model is capped to avoid oversized/token-limit request failures
+
+---
+
