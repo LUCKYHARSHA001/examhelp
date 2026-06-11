@@ -52,3 +52,118 @@ An AI-powered PDF study summarizer for students. Upload any PDF, tell it when yo
 | Streaming | Server-Sent Events (SSE) + client polling fallback |
 | Hosting | Vercel + Render + MongoDB Atlas + Upstash |
 
+---
+
+## Project Structure
+
+```
+studysnap/
+├── client/                   # React frontend
+│   ├── src/
+│   │   ├── api/
+│   │   │   └── axiosInstance.js      # Axios + JWT interceptor
+│   │   ├── components/
+│   │   │   └── Layout.jsx            # Nav + page shell
+│   │   ├── hooks/
+│   │   │   ├── useAuth.jsx           # Auth context + state
+│   │   │   ├── useSSEStream.js       # SSE + polling fallback hook
+│   │   │   └── useTheme.js           # Light/dark mode persistence
+│   │   └── pages/
+│   │       ├── LandingPage.jsx
+│   │       ├── AuthCallback.jsx
+│   │       ├── Dashboard.jsx
+│   │       ├── NewSummary.jsx        # Multi-step upload + stream
+│   │       ├── SummaryDetail.jsx
+│   │       └── Profile.jsx
+│   ├── .env.example
+│   ├── tailwind.config.js
+│   └── vite.config.js
+│
+└── server/                   # Express backend
+    ├── src/
+    │   ├── models/
+    │   │   ├── User.js
+    │   │   ├── Summary.js
+    │   │   └── RefreshToken.js
+    │   ├── index.js                  # Express app entry
+    │   ├── middleware/
+    │   │   ├── verifyJWT.js
+    │   │   ├── rateLimiter.js
+    │   │   └── upload.js             # Multer PDF config
+    │   ├── routes/
+    │   │   ├── auth.js               # OAuth + JWT endpoints
+    │   │   ├── summarize.js          # Upload + SSE stream
+    │   │   ├── summaries.js          # CRUD
+    │   │   └── user.js               # Profile + usage
+    │   ├── services/
+    │   │   ├── passportStrategy.js   # Google OAuth strategy
+    │   │   ├── GeminiService.js
+    │   │   └── pdfService.js
+    │   ├── queues/
+    │   │   └── summarizeQueue.js     # BullMQ queue
+    │   ├── workers/
+    │   │   └── summarizeWorker.js    # BullMQ worker process
+    │   └── utils/
+    │       ├── db.js
+    │       ├── redis.js
+    │       ├── jwt.js
+    │       └── promptBuilder.js
+    └── .env.example
+```
+
+---
+
+## Local Development Setup
+
+### Prerequisites
+- Node.js 18+
+- MongoDB database (local or Atlas)
+- Redis (or Upstash)
+- Google Cloud OAuth credentials
+- Gemini API key
+
+### 1. Clone & install dependencies
+
+```bash
+# Install server deps
+cd server
+npm install
+
+# Install client deps
+cd ../client
+npm install
+```
+
+### 2. Configure environment variables
+
+```bash
+# Server
+cp server/.env.example server/.env
+# Fill in all values in server/.env
+
+# Client
+cp client/.env.example client/.env
+# Set VITE_API_URL=http://localhost:5000
+```
+
+### 3. Set up the database
+
+MongoDB does not require database schema migrations. Simply make sure your local MongoDB instance is running or provide a valid connection string (`MONGODB_URI`) in your `.env`.
+
+### 4. Run all three processes (in separate terminals)
+
+```bash
+# Terminal 1 — Backend API
+cd server && npm run dev
+
+# Terminal 2 — BullMQ Worker
+cd server && node worker.js
+
+# Terminal 3 — Frontend
+cd client && npm run dev
+```
+
+The app will be at http://localhost:5173.
+
+---
+
