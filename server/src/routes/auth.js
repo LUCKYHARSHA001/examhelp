@@ -104,6 +104,35 @@ router.post('/login', authRateLimiter, async (req, res) => {
   return res.json({ accessToken });
 });
 
+// GET /api/auth/google — initiate OAuth
+router.get(
+  '/google',
+  authRateLimiter,
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false })
+);
+
+// GET /api/auth/google/callback — OAuth callback
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false, failureRedirect: `${process.env.CLIENT_URL}/?error=auth_failed` }),
+  async (req, res) => {
+    try {
+      const user = req.user;
+      const accessToken = signAccessToken({ id: user.id, email: user.email });
+      const rawRefreshToken = signRefreshToken({ id: user.id });
+
+      await createRefreshTokenRecord(user.id, rawRefreshToken);
+
+      res.cookie('refreshToken', rawRefreshToken, COOKIE_OPTIONS);
+
+      // Redirect to frontend with access token in query (short-lived, frontend stores in memory/localStorage)
+      res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${accessToken}`);
+    } catch (err) {
+      console.error('[Auth Callback Error]', err);
+      res.redirect(`${process.env.CLIENT_URL}/?error=server_error`);
+    }
+  }
+);
 
 // POST /api/auth/refresh
 router.post('/refresh', authRateLimiter, async (req, res) => {
@@ -139,6 +168,5 @@ router.post('/logout', async (req, res) => {
   res.clearCookie('refreshToken', COOKIE_OPTIONS);
   res.json({ message: 'Logged out successfully' });
 });
-
 
 export default router;
