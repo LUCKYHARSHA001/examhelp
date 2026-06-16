@@ -110,7 +110,7 @@ const Auth = () => {
             <Input
               label="Full Name"
               type="text"
-              placeholder="Varnika Karri"
+              placeholder="Adam Smith"
               value={name}
               onChange={(e) => setName(e.target.value)}
               error={errors.name}
@@ -122,7 +122,7 @@ const Auth = () => {
             <Input
               label="Email Address"
               type="email"
-              placeholder="student@university.edu"
+              placeholder="student@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={errors.email}
