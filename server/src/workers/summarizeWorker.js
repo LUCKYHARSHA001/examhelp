@@ -111,4 +111,4 @@ worker.on('failed', (job, err) => {
   console.error(`[Worker] Job ${job?.id} failed:`, err.message);
 });
 
-console.log('🔧 StudySnap worker started, listening for jobs...');
+console.log('🔧 ExamReady worker started, listening for jobs...');

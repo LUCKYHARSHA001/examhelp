@@ -1,5 +1,5 @@
 // src/index.js
-// Main entry point for the StudySnap backend Express application.
+// Main entry point for the ExamReady backend Express application.
 // Configures Express middlewares (CORS, Helmet, cookies, passport, logging),
 // registers API routes (auth, summaries, users), defines health endpoints,
 // sets up global error handling, and boots up the worker process if run in the same instance.
@@ -60,7 +60,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 StudySnap server running on port ${PORT}`);
+  console.log(`🚀 ExamReady server running on port ${PORT}`);
 });
 
 keepalive();

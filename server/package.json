@@ -1,7 +1,7 @@
 {
-  "name": "studysnap-server",
+  "name": "examready-server",
   "version": "1.0.0",
-  "description": "StudySnap backend API",
+  "description": "ExamReady backend API",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
