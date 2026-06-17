@@ -1,6 +1,6 @@
-# ⚡ StudySnap — Sci-Fi AI Exam Prep Portal
+# ⚡ ExamReady — Sci-Fi AI Exam Prep Portal
 
-StudySnap is a high-performance, futuristic cyber-themed web application designed to help students optimize their exam preparation. By uploading course syllabi or chapter PDFs, students receive custom-tailored, high-yield study guides generated via Google's **Gemini 2.5 Flash** model. 
+ExamReady is a high-performance, futuristic cyber-themed web application designed to help students optimize their exam preparation. By uploading course syllabi or chapter PDFs, students receive custom-tailored, high-yield study guides generated via Google's **Gemini 2.5 Flash** model. 
 
 The application implements a robust asynchronous background processing pipeline using **BullMQ**, **Redis**, and **Server-Sent Events (SSE)** to stream AI-generated study materials to the client in real-time as they print.
 
@@ -8,15 +8,15 @@ The application implements a robust asynchronous background processing pipeline 
 
 ## 🎨 Visual Preview
 
-Below is a look at the StudySnap student workspace, featuring a glassmorphic dashboard interface, interactive statistics cards, a drag-and-drop PDF upload wizard, and the student's active materials catalogue:
+Below is a look at the ExamReady student workspace, featuring a glassmorphic dashboard interface, interactive statistics cards, a drag-and-drop PDF upload wizard, and the student's active materials catalogue:
 
-![StudySnap Student Workspace](docs/studysnap_preview.png)
+![ExamReady Student Workspace](docs/ExamReady_preview.png)
 
 ---
 
 ## 🛠️ Technology Stack
 
-StudySnap is built using a modern, decouple full-stack Javascript architecture:
+ExamReady is built using a modern, decouple full-stack Javascript architecture:
 
 ### Frontend
 *   **Framework:** React 19 (Vite-powered environment)
@@ -43,7 +43,7 @@ StudySnap is built using a modern, decouple full-stack Javascript architecture:
 
 ## 📐 Architecture & Data Flow
 
-StudySnap processes heavy PDF operations asynchronously in the background. The flow below describes how an upload is parsed, queued, generated, and streamed live to the client:
+ExamReady processes heavy PDF operations asynchronously in the background. The flow below describes how an upload is parsed, queued, generated, and streamed live to the client:
 
 ```mermaid
 sequenceDiagram
@@ -183,7 +183,7 @@ Create a file named `.env` inside the `server/` directory and populate it with t
 
 ```bash
 # Database Configuration
-MONGODB_URI=mongodb://localhost:27017/studysnap
+MONGODB_URI=mongodb://localhost:27017/ExamReady
 REDIS_URL=redis://127.0.0.1:6379
 
 # Google OAuth Configuration (Obtained from Google Cloud Console)
@@ -215,7 +215,7 @@ cd ../client && npm install
 ```
 
 ### 4. Running the Application
-StudySnap needs three services running simultaneously (you can open multiple terminal sessions or run them in background):
+ExamReady needs three services running simultaneously (you can open multiple terminal sessions or run them in background):
 
 *   **Start the Express API Server:**
     ```bash
@@ -242,7 +242,7 @@ StudySnap needs three services running simultaneously (you can open multiple ter
 
 ## 🔒 Authentication Settings & Flow
 
-StudySnap provides a secure, modern session management architecture leveraging **JWT (JSON Web Tokens)** and **Passport.js Google OAuth 2.0**:
+ExamReady provides a secure, modern session management architecture leveraging **JWT (JSON Web Tokens)** and **Passport.js Google OAuth 2.0**:
 
 ### 1. Access & Refresh Token System
 The security design maintains a decoupled balance between front and backend:
