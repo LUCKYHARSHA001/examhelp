@@ -39,7 +39,7 @@ const StudentModule = () => {
 
   // Dynamically generates a premium SVG Certificate and triggers download
   const handleDownloadCertificate = (cert) => {
-    const userName = user ? user.name : 'StudySnap Student';
+    const userName = user ? user.name : 'ExamReady Student';
     
     // SVG Vector template for the certificate
     const svgString = `
@@ -66,7 +66,7 @@ const StudentModule = () => {
         </defs>
 
         <!-- Logo -->
-        <text x="421" y="90" font-family="'Plus Jakarta Sans', sans-serif" font-size="28" font-weight="900" fill="#C084FC" text-anchor="middle" letter-spacing="4">STUDYSNAP PORTAL</text>
+        <text x="421" y="90" font-family="'Plus Jakarta Sans', sans-serif" font-size="28" font-weight="900" fill="#C084FC" text-anchor="middle" letter-spacing="4">EXAMREADY PORTAL</text>
         <line x1="360" y1="110" x2="482" y2="110" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
 
         <!-- Header -->
@@ -87,7 +87,7 @@ const StudentModule = () => {
         <line x1="100" y1="475" x2="260" y2="475" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
         <text x="180" y="515" font-family="'Inter', sans-serif" font-size="11" fill="#62677A" text-anchor="middle">CREDENTIAL ISSUER</text>
 
-        <text x="660" y="495" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">StudySnap Platform</text>
+        <text x="660" y="495" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">ExamReady Platform</text>
         <line x1="580" y1="475" x2="740" y2="475" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
         <text x="660" y="515" font-family="'Inter', sans-serif" font-size="11" fill="#62677A" text-anchor="middle">VERIFIED AUDITOR</text>
         

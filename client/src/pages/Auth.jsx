@@ -95,7 +95,7 @@ const Auth = () => {
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
           </div>
-          <h2 style={styles.title}>StudySnap</h2>
+          <h2 style={styles.title}>ExamReady</h2>
           <p style={styles.subtitle}>
             {mode === 'login' && 'Unlock study materials & practice tools'}
             {mode === 'signup' && 'Create your advanced student account'}
@@ -205,7 +205,7 @@ const Auth = () => {
         <div style={styles.switchBox}>
           {mode === 'login' && (
             <>
-              New to StudySnap?{' '}
+              New to ExamReady?{' '}
               <button onClick={() => setMode('signup')} style={styles.linkBtn}>
                 Register now
               </button>

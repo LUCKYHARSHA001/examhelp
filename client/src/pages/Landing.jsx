@@ -100,7 +100,7 @@ const Landing = () => {
           <div style={styles.logoIcon}>
             <SVGLightning />
           </div>
-          <span style={styles.logoText}>StudySnap</span>
+          <span style={styles.logoText}>ExamReady</span>
         </div>
         <div style={styles.navActions}>
           {user ? (
@@ -364,7 +364,7 @@ const Landing = () => {
 
       {/* FOOTER */}
       <footer style={styles.footer}>
-        <span style={styles.footerText}>&copy; 2026 StudySnap Inc. Designed under premium Fortune 50 architectural guidelines.</span>
+        <span style={styles.footerText}>&copy; 2026 ExamReady Inc. Designed under premium Fortune 50 architectural guidelines.</span>
       </footer>
     </div>
   );
