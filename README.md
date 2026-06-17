@@ -10,7 +10,7 @@ The application implements a robust asynchronous background processing pipeline 
 
 Below is a look at the ExamReady student workspace, featuring a glassmorphic dashboard interface, interactive statistics cards, a drag-and-drop PDF upload wizard, and the student's active materials catalogue:
 
-![ExamReady Student Workspace](docs/ExamReady_preview.png)
+![ExamReady Student Workspace](docs/image.png)
 
 ---
 
