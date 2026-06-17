@@ -20,7 +20,7 @@ const Navbar = () => {
         if (location.pathname.startsWith('/summary/')) {
           return 'Study Guide Guide';
         }
-        return 'StudySnap';
+        return 'ExamReady';
     }
   };
 
